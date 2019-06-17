@@ -1,7 +1,7 @@
 """
 Retrain the YOLO model for your own dataset.
 """
-
+import matplotlib.pyplot as plt
 import numpy as np
 import keras.backend as K
 from keras.layers import Input, Lambda
@@ -15,7 +15,7 @@ from yolo3.utils import get_random_data
 
 def _main():
     annotation_path = 'C:\\Users\\Andrea\\Desktop\\coins-dataset-master\\classified\\test\\annotation.txt'
-    weightsPath='C:\\keras-yolo3\\logs\\000\\model_001.h5'
+    weightsPath='C:\\mykeras-yolo3\\logs\\000\\model_002.h5'
     log_dir = 'logs/000/'
     classes_path = 'model_data/voc_classes.txt'
     anchors_path = 'model_data/yolo_anchors.txt'
@@ -53,15 +53,33 @@ def _main():
     if True:
         model.compile(optimizer=Adam(lr=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})  # use custom yolo_loss Lambda layer.
 
-        batch_size = 8
+        batch_size = 16
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes), #train dataset
+        history=model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes), #train dataset
                 steps_per_epoch=max(1, num_train//batch_size),
                 validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes), #val dataset
                 validation_steps=max(1, num_val//batch_size),
-                epochs=20,
+                epochs=5,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint])
+
+        # Plot training & validation accuracy values
+        plt.plot(history.history['acc'])
+        plt.plot(history.history['val_acc'])
+        plt.title('Model accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        plt.show()
+
+        # Plot training & validation loss values
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('Model loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Test'], loc='upper left')
+        plt.show()        
         model.save_weights(log_dir + 'trained_weights_stage_1.h5')
 
     # Unfreeze and continue training, to fine-tune.
