@@ -14,7 +14,7 @@ from yolo3.utils import get_random_data
 
 
 def _main():
-    annotation_path = 'C:\\Users\\Andrea\\Desktop\\coins-dataset-master\\classified\\test\\annotation.txt'
+    annotation_path = 'C:\\CoinClassificator\\dataset\\annotation.txt'
     weightsPath='C:\\mykeras-yolo3\\logs\\000\\model_002.h5'
     log_dir = 'logs/000/'
     classes_path = 'model_data/voc_classes.txt'
