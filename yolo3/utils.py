@@ -39,7 +39,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     image = Image.open(line[0])
     iw, ih = image.size
     h, w = input_shape
-    box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
+    boxes = np.array([np.array(list(map(int,map(float,box.split(','))))) for box in line[1:]])
 
     if not random:
         # resize image
@@ -57,12 +57,12 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
 
         # correct boxes
         box_data = np.zeros((max_boxes,5))
-        if len(box)>0:
-            np.random.shuffle(box)
-            if len(box)>max_boxes: box = box[:max_boxes]
-            box[:, [0,2]] = box[:, [0,2]]*scale + dx
-            box[:, [1,3]] = box[:, [1,3]]*scale + dy
-            box_data[:len(box)] = box
+        if len(boxes)>0:
+            np.random.shuffle(boxes)
+            if len(boxes)>max_boxes: boxes = boxes[:max_boxes]
+            boxes[:, [0,2]] = boxes[:, [0,2]]*scale + dx
+            boxes[:, [1,3]] = boxes[:, [1,3]]*scale + dy
+            box_data[:len(boxes)] = boxes
 
         return image_data, box_data
 
@@ -104,18 +104,18 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
 
     # correct boxes
     box_data = np.zeros((max_boxes,5))
-    if len(box)>0:
-        np.random.shuffle(box)
-        box[:, [0,2]] = box[:, [0,2]]*nw/iw + dx
-        box[:, [1,3]] = box[:, [1,3]]*nh/ih + dy
-        if flip: box[:, [0,2]] = w - box[:, [2,0]]
-        box[:, 0:2][box[:, 0:2]<0] = 0
-        box[:, 2][box[:, 2]>w] = w
-        box[:, 3][box[:, 3]>h] = h
-        box_w = box[:, 2] - box[:, 0]
-        box_h = box[:, 3] - box[:, 1]
-        box = box[np.logical_and(box_w>1, box_h>1)] # discard invalid box
-        if len(box)>max_boxes: box = box[:max_boxes]
-        box_data[:len(box)] = box
+    if len(boxes)>0:
+        np.random.shuffle(boxes)
+        boxes[:, [0,2]] = boxes[:, [0,2]]*nw/iw + dx
+        boxes[:, [1,3]] = boxes[:, [1,3]]*nh/ih + dy
+        if flip: boxes[:, [0,2]] = w - boxes[:, [2,0]]
+        boxes[:, 0:2][boxes[:, 0:2]<0] = 0
+        boxes[:, 2][boxes[:, 2]>w] = w
+        boxes[:, 3][boxes[:, 3]>h] = h
+        box_w = boxes[:, 2] - boxes[:, 0]
+        box_h = boxes[:, 3] - boxes[:, 1]
+        boxes = boxes[np.logical_and(box_w>1, box_h>1)] # discard invalid box
+        if len(boxes)>max_boxes: boxes = boxes[:max_boxes]
+        box_data[:len(boxes)] = boxes
 
     return image_data, box_data
