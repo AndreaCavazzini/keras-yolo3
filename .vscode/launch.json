@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "--model_path=.\\logs\\000\\model.h5",
+                "--model_path=C:\\Users\\Andrea\\Google Drive\\Universita\\Magistrale\\Computer Vision\\project\\NeuralNetTrain\\model.h5",
                 "--anchors_path=.\\model_data\\yolo_anchors.txt",
                 "--classes_path=.\\model_data\\voc_classes.txt",
                 "--image"

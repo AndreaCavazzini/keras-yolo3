@@ -1,6 +1,7 @@
 """
 Retrain the YOLO model for your own dataset.
 """
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import keras.backend as K
@@ -15,7 +16,9 @@ from yolo3.utils import get_random_data
 
 def _main():
     annotation_path = 'C:\\CoinClassificator\\dataset\\annotation.txt'
-    weightsPath='C:\\mykeras-yolo3\\logs\\000\\originalW.h5'
+    trainDirPath=str( os.getenv('TRAIN_DIR'))+'\\'
+    print("train directory: ",trainDirPath)
+    weightsPath=trainDirPath+'originalW.h5'
     log_dir = 'logs/000/'
     classes_path = 'model_data/voc_classes.txt'
     anchors_path = 'model_data/yolo_anchors.txt'
@@ -62,8 +65,8 @@ def _main():
                 epochs=epochs,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint])
-        model.save_weights(log_dir + 'trained_weights.h5')
-        model.save(log_dir + 'model.h5')
+        model.save_weights(trainDirPath + 'trained_weights.h5')
+        model.save(trainDirPath + 'model.h5')
 
         print(history.history)
 
@@ -78,8 +81,8 @@ def _main():
         # Plot accuracy
         plt.figure()
         
-        plt.plot(history.history['categorical_accuracy'], label='Train acc')
-        plt.plot(history.history['val_categorical_accuracy'], label='Val acc')
+        #plt.plot(history.history['loss'], label='Train acc')
+        plt.plot(history.history['val_loss'], label='Val acc')
         plt.legend()
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
@@ -192,7 +195,7 @@ def data_generator(annotation_lines, batch_size, input_shape, anchors, num_class
         for b in range(batch_size):
             if i==0:
                 np.random.shuffle(annotation_lines)
-            image, box = get_random_data(annotation_lines[i], input_shape, random=True)
+            image, box = get_random_data(annotation_lines[i], input_shape, random=False)
             image_data.append(image)
             box_data.append(box)
             i = (i+1) % n
